@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Meal Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            margin-top: 10px;
+            margin-bottom: 10px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border-radius: 20px 20px 0 0;
+            color: white;
+            margin: -1px -1px 20px -1px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .current-date {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Dashboard Today Section */
+        .today-dashboard {
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .today-meals {
+            background: linear-gradient(45deg, #ffeaa7, #fab1a0);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .today-prep {
+            background: linear-gradient(45deg, #a29bfe, #6c5ce7);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .meal-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .meal-item:last-child {
+            border-bottom: none;
+        }
+
+        .meal-name {
+            font-weight: 600;
+            color: #2d3436;
+        }
+
+        .recipe-btn {
+            background: #00b894;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .recipe-btn:hover {
+            background: #00a085;
+            transform: translateY(-1px);
+        }
+
+        .prep-list {
+            list-style: none;
+        }
+
+        .prep-list li {
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .prep-list li:before {
+            content: "📝";
+            position: absolute;
+            left: 0;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+
+        .action-btn {
+            background: linear-gradient(45deg, #74b9ff, #0984e3);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(116, 185, 255, 0.3);
+        }
+
+        /* Weekly Charts Section */
+        .weekly-section {
+            margin: 30px 0;
+            padding: 0 20px;
+        }
+
+        .weekly-title {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #2d3436;
+        }
+
+        .weekly-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .day-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px 10px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            border-left: 4px solid #00b894;
+            cursor: pointer;
+        }
+
+        .day-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .day-card.today {
+            background: linear-gradient(45deg, #00b894, #00a085);
+            color: white;
+            border-left: 4px solid #ffffff;
+        }
+
+        .day-name {
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .day-meal {
+            font-size: 0.8rem;
+            margin: 3px 0;
+            opacity: 0.8;
+        }
+
+        .day-card.today .day-meal {
+            opacity: 1;
+        }
+
+        /* Shopping Lists */
+        .shopping-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+            padding: 0 20px;
+        }
+
+        .shopping-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .shopping-card h3 {
+            color: #2d3436;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            border-bottom: 2px solid #00b894;
+            padding-bottom: 8px;
+        }
+
+        .shopping-category {
+            margin-bottom: 15px;
+        }
+
+        .shopping-category h4 {
+            font-size: 1rem;
+            color: #636e72;
+            margin-bottom: 8px;
+        }
+
+        .shopping-category ul {
+            list-style: none;
+            font-size: 0.9rem;
+        }
+
+        .shopping-category li {
+            padding: 3px 0;
+            padding-left: 15px;
+            position: relative;
+        }
+
+        .shopping-category li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #00b894;
+            font-weight: bold;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .recipe-title {
+            color: #2d3436;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .recipe-section {
+            margin-bottom: 20px;
+        }
+
+        .recipe-section h4 {
+            color: #636e72;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .ingredient-list, .instruction-list {
+            list-style: none;
+        }
+
+        .ingredient-list li, .instruction-list li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .ingredient-list li:before {
+            content: "🥄";
+            position: absolute;
+            left: 0;
+        }
+
+        .instruction-list li:before {
+            content: counter(instruction-counter);
+            counter-increment: instruction-counter;
+            position: absolute;
+            left: 0;
+            background: #00b894;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .instruction-list {
+            counter-reset: instruction-counter;
+        }
+
+        .nutrition-info {
+            background: linear-gradient(45deg, #ffeaa7, #fab1a0);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .nutrition-info h4 {
+            margin-bottom: 10px;
+        }
+
+        .nutrition-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+        }
+
+        .nutrition-item {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 8px;
+            border-radius: 8px;
+        }
+
+        .nutrition-value {
+            font-weight: bold;
+            color: #2d3436;
+        }
+
+        .nutrition-label {
+            font-size: 0.8rem;
+            color: #636e72;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                margin: 5px;
+                padding: 5px;
+                border-radius: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.6rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .weekly-grid {
+                grid-template-columns: 1fr;
+                gap: 5px;
+            }
+
+            .day-card {
+                padding: 12px 8px;
+            }
+
+            .day-name {
+                font-size: 0.8rem;
+            }
+
+            .day-meal {
+                font-size: 0.7rem;
+            }
+
+            .shopping-section {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+                padding: 20px;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍽️ Daily Meal Dashboard</h1>
+            <div class="current-date" id="currentDate"></div>
+        </div>
+
+        <!-- Today's Dashboard -->
+        <div class="today-dashboard">
+            <div class="dashboard-grid">
+                <div class="today-meals">
+                    <h2 class="section-title">📅 Today's Meals</h2>
+                    <div class="meal-item">
+                        <div>
+                            <div class="meal-name" id="todayBreakfast">Overnight Oats with Seeds</div>
+                            <small>Breakfast • 12g protein</small>
+                        </div>
+                        <button class="recipe-btn" onclick="showRecipe('breakfast')">Recipe</button>
+                    </div>
+                    <div class="meal-item">
+                        <div>
+                            <div class="meal-name" id="todayLunch">Masoor Dal</div>
+                            <small>Lunch • 18g protein</small>
+                        </div>
+                        <button class="recipe-btn" onclick="showRecipe('lunch')">Recipe</button>
+                    </div>
+                    <div class="meal-item">
+                        <div>
+                            <div class="meal-name" id="todayDinner">Dal Soup with Tofu</div>
+                            <small>Dinner • 16g protein</small>
+                        </div>
+                        <button class="recipe-btn" onclick="showRecipe('dinner')">Recipe</button>
+                    </div>
+                </div>
+
+                <div class="today-prep">
+                    <h2 class="section-title">🧑‍🍳 Today's Meal Prep</h2>
+                    <ul class="prep-list" id="todayPrep">
+                        <li>Prepare overnight oats for tomorrow</li>
+                        <li>Soak chickpeas for Wednesday</li>
+                        <li>Chop vegetables for lunch</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <button class="action-btn" onclick="showWeeklyChart('breakfast')">📊 Weekly Breakfast</button>
+            <button class="action-btn" onclick="showWeeklyChart('lunch')">📊 Weekly Lunch</button>
+            <button class="action-btn" onclick="showWeeklyChart('dinner')">📊 Weekly Dinner</button>
+            <button class="action-btn" onclick="showShoppingList()">🛒 Shopping Lists</button>
+        </div>
+
+        <!-- Weekly Charts (Hidden by default) -->
+        <div id="weeklyCharts" style="display: none;">
+            <div class="weekly-section">
+                <h2 class="weekly-title" id="chartTitle">Weekly Breakfast Plan</h2>
+                <div class="weekly-grid" id="weeklyGrid">
+                    <!-- Weekly chart will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Shopping Lists (Hidden by default) -->
+        <div id="shoppingSection" style="display: none;">
+            <div class="shopping-section">
+                <div class="shopping-card">
+                    <h3>🛒 Monthly Shopping List</h3>
+                    <div class="shopping-category">
+                        <h4>🫘 Proteins & Legumes</h4>
+                        <ul>
+                            <li>Mixed lentils (masoor, moong, chana dal) - 2kg</li>
+                            <li>Chickpeas (dried) - 1kg</li>
+                            <li>Kidney beans (rajma) - 500g</li>
+                            <li>Firm tofu - 1kg</li>
+                            <li>Paneer - 500g</li>
+                            <li>Soy milk - 4 liters</li>
+                        </ul>
+                    </div>
+                    <div class="shopping-category">
+                        <h4>🌾 Grains & Seeds</h4>
+                        <ul>
+                            <li>Rolled oats - 1kg</li>
+                            <li>Quinoa - 500g</li>
+                            <li>Brown rice - 2kg</li>
+                            <li>Multigrain bread - 4 loaves</li>
+                            <li>Ragi/bajra flour - 1kg</li>
+                            <li>Chia seeds - 200g</li>
+                            <li>Sesame seeds - 500g</li>
+                            <li>Sunflower seeds - 500g</li>
+                        </ul>
+                    </div>
+                    <div class="shopping-category">
+                        <h4>🧈 Pantry Items</h4>
+                        <ul>
+                            <li>Almond butter - 2 jars</li>
+                            <li>Ghee - 500g</li>
+                            <li>Turmeric powder - 100g</li>
+                            <li>Cumin powder - 100g</li>
+                            <li>Roasted chana - 1kg</li>
+                            <li>Makhana - 500g</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="shopping-card">
+                    <h3>🥬 Weekly Fresh Shopping</h3>
+                    <div class="shopping-category">
+                        <h4>🥬 Vegetables</h4>
+                        <ul>
+                            <li>Spinach - 2 bunches</li>
+                            <li>Methi leaves - 1 bunch</li>
+                            <li>Amaranth leaves - 1 bunch</li>
+                            <li>Carrots - 1kg</li>
+                            <li>Cucumber - 1kg</li>
+                            <li>Tomatoes - 1kg</li>
+                            <li>Broccoli - 500g</li>
+                            <li>Onions - 1kg</li>
+                            <li>Ginger - 200g</li>
+                        </ul>
+                    </div>
+                    <div class="shopping-category">
+                        <h4>🍎 Fruits</h4>
+                        <ul>
+                            <li>Bananas - 2 dozen</li>
+                            <li>Oranges - 1kg</li>
+                            <li>Guava - 1kg</li>
+                            <li>Pomegranate - 2 pieces</li>
+                            <li>Lemons - 500g</li>
+                            <li>Dates - 250g</li>
+                            <li>Raisins - 250g</li>
+                        </ul>
+                    </div>
+                    <div class="shopping-category">
+                        <h4>🥛 Dairy & Fresh</h4>
+                        <ul>
+                            <li>Fresh curd - 1kg</li>
+                            <li>Coconut water - 7 bottles</li>
+                            <li>Fresh herbs (mint, coriander)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recipe Modal -->
+    <div id="recipeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 class="recipe-title" id="recipeTitle">Recipe Title</h2>
+            <div id="recipeContent">
+                <!-- Recipe content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Meal plans data
+        const mealPlans = {
+            breakfast: {
+                0: { name: "Overnight Oats with Seeds", protein: "12g" }, // Sunday
+                1: { name: "Overnight Oats with Seeds", protein: "12g" }, // Monday
+                2: { name: "High-Protein Smoothie", protein: "14g" }, // Tuesday
+                3: { name: "Chickpea Salad Jar", protein: "10g" }, // Wednesday
+                4: { name: "Overnight Oats with Seeds", protein: "12g" }, // Thursday
+                5: { name: "High-Protein Smoothie", protein: "14g" }, // Friday
+                6: { name: "Chickpea Salad Jar", protein: "10g" } // Saturday
+            },
+            lunch: {
+                0: { name: "Paneer Curry", protein: "22g" }, // Sunday
+                1: { name: "Masoor Dal", protein: "18g" }, // Monday
+                2: { name: "Quinoa Bowl", protein: "16g" }, // Tuesday
+                3: { name: "Rajma Curry", protein: "20g" }, // Wednesday
+                4: { name: "Tofu Stir-fry", protein: "17g" }, // Thursday
+                5: { name: "Chana Curry", protein: "19g" }, // Friday
+                6: { name: "Moong Dal Khichdi", protein: "15g" } // Saturday
+            },
+            dinner: {
+                0: { name: "Mixed Dal Soup", protein: "17g" }, // Sunday
+                1: { name: "Dal Soup with Tofu", protein: "16g" }, // Monday
+                2: { name: "Ragi Porridge", protein: "12g" }, // Tuesday
+                3: { name: "Vegetable Uttapam", protein: "14g" }, // Wednesday
+                4: { name: "Methi Paratha", protein: "15g" }, // Thursday
+                5: { name: "Bajra Khichdi", protein: "13g" }, // Friday
+                6: { name: "Spinach Paratha", protein: "16g" } // Saturday
+            }
+        };
+
+        // Recipe data
+        const recipes = {
+            breakfast: {
+                "Overnight Oats with Seeds": {
+                    ingredients: [
+                        "1/2 cup rolled oats",
+                        "1/2 cup soy milk",
+                        "1 tsp chia seeds",
+                        "1 tbsp sunflower seeds",
+                        "2-3 chopped dates",
+                        "1 tsp sesame seeds",
+                        "1 banana (for morning)",
+                        "Pinch of cinnamon"
+                    ],
+                    instructions: [
+                        "In a jar, mix oats, soy milk, chia seeds, sunflower seeds, chopped dates, and sesame seeds",
+                        "Stir well to combine all ingredients",
+                        "Cover and refrigerate overnight",
+                        "In the morning, add sliced banana and a pinch of cinnamon",
+                        "Enjoy immediately or take to office"
+                    ],
+                    nutrition: { protein: "12g", iron: "High", calories: "320" }
+                },
+                "High-Protein Smoothie": {
+                    ingredients: [
+                        "1/2 cup soy milk",
+                        "1 banana",
+                        "1 tbsp soaked almonds",
+                        "1 tsp chia seeds",
+                        "1/2 cup fresh spinach",
+                        "1 tsp sesame seeds"
+                    ],
+                    instructions: [
+                        "Soak almonds overnight",
+                        "Add all ingredients to blender",
+                        "Blend until smooth and creamy",
+                        "Pour into glass and serve immediately",
+                        "Can be prepared in bottles for office"
+                    ],
+                    nutrition: { protein: "14g", iron: "High", calories: "280" }
+                },
+                "Chickpea Salad Jar": {
+                    ingredients: [
+                        "1/2 cup boiled chickpeas",
+                        "1/4 cup chopped cucumber",
+                        "1/4 cup chopped tomato",
+                        "2 tbsp fresh coriander",
+                        "1 tbsp lemon juice",
+                        "1/2 tsp cumin powder",
+                        "Salt to taste",
+                        "1 tsp roasted sesame seeds"
+                    ],
+                    instructions: [
+                        "Boil chickpeas until tender (can be done in batch)",
+                        "Chop cucumber and tomato into small pieces",
+                        "In a glass jar, layer chickpeas at bottom",
+                        "Add chopped vegetables and fresh coriander",
+                        "Mix lemon juice, cumin powder, and salt",
+                        "Pour dressing over salad",
+                        "Top with sesame seeds",
+                        "Can be stored in fridge for 2 days"
+                    ],
+                    nutrition: { protein: "10g", iron: "High", calories: "250" }
+                }
+            },
+            lunch: {
+                "Masoor Dal": {
+                    ingredients: [
+                        "1 cup masoor dal (red lentils)",
+                        "2 cups water",
+                        "1/2 tsp turmeric",
+                        "1 tsp cumin seeds",
+                        "2 cloves garlic",
+                        "1 bunch spinach",
+                        "1/2 cup brown rice",
+                        "1 tbsp ghee",
+                        "Salt to taste"
+                    ],
+                    instructions: [
+                        "Wash and cook masoor dal with turmeric until soft",
+                        "In a pan, heat ghee and add cumin seeds",
+                        "Add minced garlic and sauté until fragrant",
+                        "Add cooked dal and simmer for 10 minutes",
+                        "In another pan, sauté chopped spinach with garlic",
+                        "Cook brown rice separately",
+                        "Serve dal with rice, spinach, and curd"
+                    ],
+                    nutrition: { protein: "18g", iron: "High", calories: "450" }
+                },
+                "Quinoa Bowl": {
+                    ingredients: [
+                        "3/4 cup quinoa",
+                        "1/2 cup mixed vegetables (carrots, peas, beans)",
+                        "1/4 cup paneer cubes",
+                        "2 tbsp tahini",
+                        "1 tbsp lemon juice",
+                        "1 tsp olive oil",
+                        "Salt and pepper to taste"
+                    ],
+                    instructions: [
+                        "Cook quinoa in 1.5 cups water until fluffy",
+                        "Steam or sauté mixed vegetables",
+                        "Pan-fry paneer cubes until golden",
+                        "Mix tahini with lemon juice for dressing",
+                        "Combine quinoa, vegetables, and paneer",
+                        "Drizzle with tahini dressing and serve"
+                    ],
+                    nutrition: { protein: "16g", iron: "Moderate", calories: "420" }
+                }
+            },
+            dinner: {
+                "Dal Soup with Tofu": {
+                    ingredients: [
+                        "1/2 cup mixed dal",
+                        "100g firm tofu, cubed",
+                        "2 cups water",
+                        "1/2 tsp turmeric",
+                        "1 tsp ginger-garlic paste",
+                        "2 rotis",
+                        "Mixed salad with lemon dressing"
+                    ],
+                    instructions: [
+                        "Cook mixed dal with turmeric until very soft",
+                        "Blend to make soup consistency",
+                        "Pan-fry tofu cubes until golden",
+                        "Add tofu to dal soup and simmer",
+                        "Season with salt and ginger-garlic paste",
+                        "Serve hot with rotis and fresh salad"
+                    ],
+                    nutrition: { protein: "16g", iron: "Moderate", calories: "380" }
+                },
+                "Ragi Porridge": {
+                    ingredients: [
+                        "1/2 cup ragi flour",
+                        "2 cups water",
+                        "1/2 cup mixed vegetables",
+                        "1 tbsp roasted seeds",
+                        "1 tsp ghee",
+                        "Salt to taste"
+                    ],
+                    instructions: [
+                        "Mix ragi flour with little water to make paste",
+                        "Boil remaining water and add ragi paste",
+                        "Cook on low heat, stirring continuously",
+                        "Add chopped vegetables and cook until tender",
+                        "Season with salt and ghee",
+                        "Top with roasted seeds before serving"
+                    ],
+                    nutrition: { protein: "12g", iron: "High", calories: "290" }
+                }
+            }
+        };
+
+        // Meal prep tasks by day
+        const mealPrepTasks = {
+            0: [ // Sunday
+                "Make 3 overnight oats jars for Mon/Thu/Sun",
+                "Soak almonds for the week",
+                "Boil large batch of chickpeas",
+                "Wash and prep vegetables for the week",
+                "Make almond-date energy balls (10-12 pieces)"
+            ],
+            1: [ // Monday
+                "Prepare overnight oats for tomorrow",
+                "Soak chickpeas for Wednesday",
+                "Chop vegetables for lunch"
+            ],
+            2: [ // Tuesday
+                "Prep smoothie ingredients in freezer bags",
+                "Prepare uttapam batter for tomorrow's dinner",
+                "Wash spinach for tomorrow's lunch"
+            ],
+            3: [ // Wednesday
+                "Make 2 chickpea salad jars (for Sat & next Mon)",
+                "Make hummus batch for snacks",
+                "Prep vegetables for tofu stir-fry"
+            ],
+            4: [ // Thursday
+                "Check overnight oats supply",
+                "Make paratha dough for tomorrow's dinner",
+                "Prep methi leaves"
+            ],
+            5: [ // Friday
+                "Prep smoothie ingredients",
+                "Cook millet batch for weekend",
+                "Wash spinach for Saturday's paratha"
+            ],
+            6: [ // Saturday
+                "Plan Sunday's meal prep",
+                "Use up remaining chickpea salad",
+                "Prep mixed dal for tomorrow's dinner"
+            ]
+        };
+
+        // Initialize the app
+        function initApp() {
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            
+            // Set current date
+            document.getElementById('currentDate').textContent = today.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            // Set today's meals
+            document.getElementById('todayBreakfast').textContent = mealPlans.breakfast[dayOfWeek].name;
+            document.getElementById('todayLunch').textContent = mealPlans.lunch[dayOfWeek].name;
+            document.getElementById('todayDinner').textContent = mealPlans.dinner[dayOfWeek].name;
+            
+            // Set today's meal prep
+            const prepList = document.getElementById('todayPrep');
+            prepList.innerHTML = '';
+            mealPrepTasks[dayOfWeek].forEach(task => {
+                const li = document.createElement('li');
+                li.textContent = task;
+                prepList.appendChild(li);
+            });
+        }
+
+        // Show recipe modal
+        function showRecipe(mealType) {
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const mealName = mealPlans[mealType][dayOfWeek].name;
+            const recipe = recipes[mealType][mealName];
+            
+            if (!recipe) {
+                alert('Recipe not available for this meal');
+                return;
+            }
+            
+            document.getElementById('recipeTitle').textContent = mealName;
+            
+            const content = document.getElementById('recipeContent');
+            content.innerHTML = `
+                <div class="recipe-section">
+                    <h4>🥄 Ingredients</h4>
+                    <ul class="ingredient-list">
+                        ${recipe.ingredients.map(ingredient => `<li>${ingredient}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <div class="recipe-section">
+                    <h4>👩‍🍳 Instructions</h4>
+                    <ol class="instruction-list">
+                        ${recipe.instructions.map(instruction => `<li>${instruction}</li>`).join('')}
+                    </ol>
+                </div>
+                
+                <div class="nutrition-info">
+                    <h4>📊 Nutrition Information</h4>
+                    <div class="nutrition-grid">
+                        <div class="nutrition-item">
+                            <div class="nutrition-value">${recipe.nutrition.protein}</div>
+                            <div class="nutrition-label">Protein</div>
+                        </div>
+                        <div class="nutrition-item">
+                            <div class="nutrition-value">${recipe.nutrition.iron}</div>
+                            <div class="nutrition-label">Iron</div>
+                        </div>
+                        <div class="nutrition-item">
+                            <div class="nutrition-value">${recipe.nutrition.calories}</div>
+                            <div class="nutrition-label">Calories</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('recipeModal').style.display = 'block';
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('recipeModal').style.display = 'none';
+        }
+
+        // Show weekly chart
+        function showWeeklyChart(mealType) {
+            const chartSection = document.getElementById('weeklyCharts');
+            const chartTitle = document.getElementById('chartTitle');
+            const weeklyGrid = document.getElementById('weeklyGrid');
+            
+            // Hide shopping section
+            document.getElementById('shoppingSection').style.display = 'none';
+            
+            // Show chart section
+            chartSection.style.display = 'block';
+            chartTitle.textContent = `Weekly ${mealType.charAt(0).toUpperCase() + mealType.slice(1)} Plan`;
+            
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const today = new Date().getDay();
+            
+            weeklyGrid.innerHTML = '';
+            
+            days.forEach((day, index) => {
+                const meal = mealPlans[mealType][index];
+                const dayCard = document.createElement('div');
+                dayCard.className = `day-card ${index === today ? 'today' : ''}`;
+                dayCard.onclick = () => showDayRecipe(mealType, index);
+                
+                dayCard.innerHTML = `
+                    <div class="day-name">${day}</div>
+                    <div class="day-meal">${meal.name}</div>
+                    <div class="day-meal">${meal.protein}</div>
+                `;
+                
+                weeklyGrid.appendChild(dayCard);
+            });
+            
+            chartSection.classList.add('fade-in');
+        }
+
+        // Show day recipe from weekly chart
+        function showDayRecipe(mealType, dayIndex) {
+            const mealName = mealPlans[mealType][dayIndex].name;
+            const recipe = recipes[mealType][mealName];
+            
+            if (!recipe) {
+                alert('Recipe not available for this meal');
+                return;
+            }
+            
+            document.getElementById('recipeTitle').textContent = mealName;
+            
+            const content = document.getElementById('recipeContent');
+            content.innerHTML = `
+                <div class="recipe-section">
+                    <h4>🥄 Ingredients</h4>
+                    <ul class="ingredient-list">
+                        ${recipe.ingredients.map(ingredient => `<li>${ingredient}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <div class="recipe-section">
+                    <h4>👩‍🍳 Instructions</h4>
+                    <ol class="instruction-list">
+                        ${recipe.instructions.map(instruction => `<li>${instruction}</li>`).join('')}
+                    </ol>
+                </div>
+                
+                <div class="nutrition-info">
+                    <h4>📊 Nutrition Information</h4>
+                    <div class="nutrition-grid">
+                        <div class="nutrition-item">
+                            <div class="nutrition-value">${recipe.nutrition.protein}</div>
+                            <div class="nutrition-label">Protein</div>
+                        </div>
+                        <div class="nutrition-item">
+                            <div class="nutrition-value">${recipe.nutrition.iron}</div>
+                            <div class="nutrition-label">Iron</div>
+                        </div>
+                        <div class="nutrition-item">
+                            <div class="nutrition-value">${recipe.nutrition.calories}</div>
+                            <div class="nutrition-label">Calories</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('recipeModal').style.display = 'block';
+        }
+
+        // Show shopping list
+        function showShoppingList() {
+            // Hide weekly charts
+            document.getElementById('weeklyCharts').style.display = 'none';
+            
+            // Show shopping section
+            const shoppingSection = document.getElementById('shoppingSection');
+            shoppingSection.style.display = 'block';
+            shoppingSection.classList.add('fade-in');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('recipeModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Initialize app when page loads
+        document.addEventListener('DOMContentLoaded', initApp);
+
+        // Add some interactive features for mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add touch feedback to buttons
+            const buttons = document.querySelectorAll('.recipe-btn, .action-btn');
+            buttons.forEach(button => {
+                button.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.95)';
+                });
+                
+                button.addEventListener('touchend', function() {
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                });
+            });
+
+            // Add swipe gesture for mobile navigation
+            let startX = 0;
+            let startY = 0;
+
+            document.addEventListener('touchstart', function(e) {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+            });
+
+            document.addEventListener('touchend', function(e) {
+                if (!startX || !startY) return;
+
+                let endX = e.changedTouches[0].clientX;
+                let endY = e.changedTouches[0].clientY;
+
+                let diffX = startX - endX;
+                let diffY = startY - endY;
+
+                // Only process horizontal swipes that are greater than vertical
+                if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+                    const weeklyCharts = document.getElementById('weeklyCharts');
+                    const shoppingSection = document.getElementById('shoppingSection');
+                    
+                    if (weeklyCharts.style.display === 'block') {
+                        // Swipe left to show shopping, right to hide charts
+                        if (diffX > 0) {
+                            showShoppingList();
+                        } else {
+                            weeklyCharts.style.display = 'none';
+                        }
+                    } else if (shoppingSection.style.display === 'block') {
+                        // Swipe right to hide shopping
+                        if (diffX < 0) {
+                            shoppingSection.style.display = 'none';
+                        }
+                    }
+                }
+
+                startX = 0;
+                startY = 0;
+            });
+        });
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+                document.getElementById('weeklyCharts').style.display = 'none';
+                document.getElementById('shoppingSection').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
