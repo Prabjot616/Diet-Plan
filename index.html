@@ -874,56 +874,68 @@
             const today = new Date();
             const dayOfWeek = today.getDay();
             const mealName = mealPlans[mealType][dayOfWeek].name;
-            const recipe = recipes[mealType][mealName];
+            const recipe = recipes[mealType] && recipes[mealType][mealName];
             
             if (!recipe) {
-                alert('Recipe not available for this meal');
-                return;
-            }
-            
-            document.getElementById('recipeTitle').textContent = mealName;
-            
-            const content = document.getElementById('recipeContent');
-            content.innerHTML = `
-                <div class="recipe-section">
-                    <h4>🥄 Ingredients</h4>
-                    <ul class="ingredient-list">
-                        ${recipe.ingredients.map(ingredient => `<li>${ingredient}</li>`).join('')}
-                    </ul>
-                </div>
+                // Show a basic recipe template if detailed recipe not available
+                document.getElementById('recipeTitle').textContent = mealName;
+                document.getElementById('recipeContent').innerHTML = `
+                    <div class="recipe-section">
+                        <h4>📝 Recipe Details</h4>
+                        <p>This is your ${mealType} for today: <strong>${mealName}</strong></p>
+                        <p>Protein content: <strong>${mealPlans[mealType][dayOfWeek].protein}</strong></p>
+                        <p>Detailed recipe will be added soon!</p>
+                    </div>
+                `;
+            } else {
+                document.getElementById('recipeTitle').textContent = mealName;
                 
-                <div class="recipe-section">
-                    <h4>👩‍🍳 Instructions</h4>
-                    <ol class="instruction-list">
-                        ${recipe.instructions.map(instruction => `<li>${instruction}</li>`).join('')}
-                    </ol>
-                </div>
-                
-                <div class="nutrition-info">
-                    <h4>📊 Nutrition Information</h4>
-                    <div class="nutrition-grid">
-                        <div class="nutrition-item">
-                            <div class="nutrition-value">${recipe.nutrition.protein}</div>
-                            <div class="nutrition-label">Protein</div>
-                        </div>
-                        <div class="nutrition-item">
-                            <div class="nutrition-value">${recipe.nutrition.iron}</div>
-                            <div class="nutrition-label">Iron</div>
-                        </div>
-                        <div class="nutrition-item">
-                            <div class="nutrition-value">${recipe.nutrition.calories}</div>
-                            <div class="nutrition-label">Calories</div>
+                const content = document.getElementById('recipeContent');
+                content.innerHTML = `
+                    <div class="recipe-section">
+                        <h4>🥄 Ingredients</h4>
+                        <ul class="ingredient-list">
+                            ${recipe.ingredients.map(ingredient => `<li>${ingredient}</li>`).join('')}
+                        </ul>
+                    </div>
+                    
+                    <div class="recipe-section">
+                        <h4>👩‍🍳 Instructions</h4>
+                        <ol class="instruction-list">
+                            ${recipe.instructions.map(instruction => `<li>${instruction}</li>`).join('')}
+                        </ol>
+                    </div>
+                    
+                    <div class="nutrition-info">
+                        <h4>📊 Nutrition Information</h4>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">${recipe.nutrition.protein}</div>
+                                <div class="nutrition-label">Protein</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">${recipe.nutrition.iron}</div>
+                                <div class="nutrition-label">Iron</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">${recipe.nutrition.calories}</div>
+                                <div class="nutrition-label">Calories</div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
+                `;
+            }
             
-            document.getElementById('recipeModal').style.display = 'block';
+            const modal = document.getElementById('recipeModal');
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
         }
 
         // Close modal
         function closeModal() {
-            document.getElementById('recipeModal').style.display = 'none';
+            const modal = document.getElementById('recipeModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto'; // Restore background scrolling
         }
 
         // Show weekly chart
@@ -965,51 +977,61 @@
         // Show day recipe from weekly chart
         function showDayRecipe(mealType, dayIndex) {
             const mealName = mealPlans[mealType][dayIndex].name;
-            const recipe = recipes[mealType][mealName];
+            const recipe = recipes[mealType] && recipes[mealType][mealName];
             
             if (!recipe) {
-                alert('Recipe not available for this meal');
-                return;
-            }
-            
-            document.getElementById('recipeTitle').textContent = mealName;
-            
-            const content = document.getElementById('recipeContent');
-            content.innerHTML = `
-                <div class="recipe-section">
-                    <h4>🥄 Ingredients</h4>
-                    <ul class="ingredient-list">
-                        ${recipe.ingredients.map(ingredient => `<li>${ingredient}</li>`).join('')}
-                    </ul>
-                </div>
+                // Show a basic recipe template if detailed recipe not available
+                document.getElementById('recipeTitle').textContent = mealName;
+                document.getElementById('recipeContent').innerHTML = `
+                    <div class="recipe-section">
+                        <h4>📝 Recipe Details</h4>
+                        <p>This is your ${mealType}: <strong>${mealName}</strong></p>
+                        <p>Protein content: <strong>${mealPlans[mealType][dayIndex].protein}</strong></p>
+                        <p>Detailed recipe will be added soon!</p>
+                    </div>
+                `;
+            } else {
+                document.getElementById('recipeTitle').textContent = mealName;
                 
-                <div class="recipe-section">
-                    <h4>👩‍🍳 Instructions</h4>
-                    <ol class="instruction-list">
-                        ${recipe.instructions.map(instruction => `<li>${instruction}</li>`).join('')}
-                    </ol>
-                </div>
-                
-                <div class="nutrition-info">
-                    <h4>📊 Nutrition Information</h4>
-                    <div class="nutrition-grid">
-                        <div class="nutrition-item">
-                            <div class="nutrition-value">${recipe.nutrition.protein}</div>
-                            <div class="nutrition-label">Protein</div>
-                        </div>
-                        <div class="nutrition-item">
-                            <div class="nutrition-value">${recipe.nutrition.iron}</div>
-                            <div class="nutrition-label">Iron</div>
-                        </div>
-                        <div class="nutrition-item">
-                            <div class="nutrition-value">${recipe.nutrition.calories}</div>
-                            <div class="nutrition-label">Calories</div>
+                const content = document.getElementById('recipeContent');
+                content.innerHTML = `
+                    <div class="recipe-section">
+                        <h4>🥄 Ingredients</h4>
+                        <ul class="ingredient-list">
+                            ${recipe.ingredients.map(ingredient => `<li>${ingredient}</li>`).join('')}
+                        </ul>
+                    </div>
+                    
+                    <div class="recipe-section">
+                        <h4>👩‍🍳 Instructions</h4>
+                        <ol class="instruction-list">
+                            ${recipe.instructions.map(instruction => `<li>${instruction}</li>`).join('')}
+                        </ol>
+                    </div>
+                    
+                    <div class="nutrition-info">
+                        <h4>📊 Nutrition Information</h4>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">${recipe.nutrition.protein}</div>
+                                <div class="nutrition-label">Protein</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">${recipe.nutrition.iron}</div>
+                                <div class="nutrition-label">Iron</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">${recipe.nutrition.calories}</div>
+                                <div class="nutrition-label">Calories</div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
+                `;
+            }
             
-            document.getElementById('recipeModal').style.display = 'block';
+            const modal = document.getElementById('recipeModal');
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
         }
 
         // Show shopping list
